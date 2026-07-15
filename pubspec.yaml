@@ -1,0 +1,27 @@
+name: network_inspector
+description: >
+  A from-scratch, Chucker-style debug network inspector for Flutter apps using Dio.
+  Captures every request/response through a Dio interceptor, keeps a bounded in-memory
+  log, and exposes a Material 3 UI to search, filter and inspect traffic. Debug-only:
+  every entry point is a no-op outside kDebugMode.
+version: 0.1.0
+publish_to: 'none'
+
+environment:
+  sdk: ^3.10.8
+  flutter: ">=3.27.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.9.2
+  flutter_local_notifications: ^19.4.1
+  share_plus: ^10.1.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  mocktail: ^1.0.4
+
+flutter:
