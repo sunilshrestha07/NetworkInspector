@@ -1,6 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-/// Shows and updates the "Network Inspector Running" notification.
+/// Shows and updates the "&lt;app name&gt; Chucker" ongoing notification.
 ///
 /// This is intentionally *not* a native Android foreground service: it
 /// reuses the host app's existing [FlutterLocalNotificationsPlugin]
@@ -11,9 +11,15 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 /// deliberate choice to avoid adding a native Android `<service>` and
 /// `FOREGROUND_SERVICE` permission for a debug-only tool.
 class NetworkInspectorNotificationService {
-  NetworkInspectorNotificationService(this._plugin);
+  NetworkInspectorNotificationService(this._plugin, {required String appName})
+      : _appName = appName;
 
   final FlutterLocalNotificationsPlugin _plugin;
+
+  /// Host app's name, shown in the notification title (e.g. "Chandragiri
+  /// Chucker") so it's identifiable when several debug builds are installed
+  /// at once.
+  final String _appName;
 
   /// Fixed notification id so every call to [show] updates the same
   /// notification instead of stacking new ones.
@@ -34,7 +40,7 @@ class NetworkInspectorNotificationService {
   Future<void> show(int count) {
     return _plugin.show(
       notificationId,
-      'Network Inspector Running',
+      '$_appName Chucker',
       '$count request${count == 1 ? '' : 's'} captured',
       const NotificationDetails(
         android: AndroidNotificationDetails(

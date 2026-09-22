@@ -29,9 +29,11 @@ class NetworkInspector {
   /// Configures the inspector. Call this once during app bootstrap, before
   /// the first request that should be captured fires.
   ///
-  /// - [navigatorKey]: the app's root navigator key, used so the "Network
-  ///   Inspector Running" notification can open the inspector from
-  ///   whichever screen is currently showing.
+  /// - [navigatorKey]: the app's root navigator key, used so the notification
+  ///   can open the inspector from whichever screen is currently showing.
+  /// - [appName]: the host app's name, shown in the ongoing notification
+  ///   title (e.g. "Chandragiri Chucker") so it's identifiable when several
+  ///   debug builds are installed at once.
   /// - [maxLogs]: how many requests to retain before the oldest is evicted
   ///   (default 500).
   /// - [notificationsPlugin]: the host app's existing
@@ -40,6 +42,7 @@ class NetworkInspector {
   ///   capturing and the in-app screens still work.
   static void initialize({
     required GlobalKey<NavigatorState> navigatorKey,
+    required String appName,
     int maxLogs = 500,
     FlutterLocalNotificationsPlugin? notificationsPlugin,
     bool enableNotification = true,
@@ -47,7 +50,7 @@ class NetworkInspector {
     if (!kDebugMode) return;
 
     final notificationService = (enableNotification && notificationsPlugin != null)
-        ? NetworkInspectorNotificationService(notificationsPlugin)
+        ? NetworkInspectorNotificationService(notificationsPlugin, appName: appName)
         : null;
 
     NetworkInspectorConfig.init(
@@ -92,8 +95,7 @@ class NetworkInspector {
   }
 }
 
-/// Cancels the "Network Inspector Running" notification once the app is
-/// torn down.
+/// Cancels the ongoing notification once the app is torn down.
 ///
 /// The notification is posted as `ongoing`/`autoCancel: false` so it can't
 /// be swiped away by accident while the app is running (see
