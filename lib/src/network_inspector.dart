@@ -21,6 +21,11 @@ import 'presentation/screens/network_call_list_screen.dart';
 class NetworkInspector {
   const NetworkInspector._();
 
+  /// Observer from a previous [initialize] call, kept around so it can be
+  /// unregistered if [initialize] runs again (e.g. hot restart in tests)
+  /// instead of leaking a duplicate observer.
+  static _NotificationLifecycleObserver? _lifecycleObserver;
+
   /// Configures the inspector. Call this once during app bootstrap, before
   /// the first request that should be captured fires.
   ///
@@ -56,6 +61,16 @@ class NetworkInspector {
     // visibly running from app launch rather than appearing only once the
     // first request completes.
     unawaited(notificationService?.show(NetworkInspectorConfig.instance.repository.all.length));
+
+    if (_lifecycleObserver != null) {
+      WidgetsBinding.instance.removeObserver(_lifecycleObserver!);
+      _lifecycleObserver = null;
+    }
+    if (notificationService != null) {
+      final observer = _NotificationLifecycleObserver(notificationService);
+      WidgetsBinding.instance.addObserver(observer);
+      _lifecycleObserver = observer;
+    }
   }
 
   /// Whether [payload] identifies a tap on the inspector's own notification
@@ -74,5 +89,28 @@ class NetworkInspector {
     NetworkInspectorConfig.instance.navigatorKey.currentState?.push(
       MaterialPageRoute<void>(builder: (_) => const NetworkCallListScreen()),
     );
+  }
+}
+
+/// Cancels the "Network Inspector Running" notification once the app is
+/// torn down.
+///
+/// The notification is posted as `ongoing`/`autoCancel: false` so it can't
+/// be swiped away by accident while the app is running (see
+/// [NetworkInspectorNotificationService]), but nothing else ever calls
+/// [NetworkInspectorNotificationService.cancel] — without this observer the
+/// notification would be stuck forever once the app is closed or removed
+/// from recents, since it isn't tied to a real Android foreground service
+/// that the OS would clean up on its own.
+class _NotificationLifecycleObserver extends WidgetsBindingObserver {
+  _NotificationLifecycleObserver(this._notificationService);
+
+  final NetworkInspectorNotificationService _notificationService;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.detached) {
+      unawaited(_notificationService.cancel());
+    }
   }
 }
