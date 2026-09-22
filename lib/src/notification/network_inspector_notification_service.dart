@@ -58,7 +58,7 @@ class NetworkInspectorNotificationService {
           channelId,
           channelName,
           channelDescription: channelDescription,
-          ongoing: true,
+          ongoing: false,
           autoCancel: false,
           onlyAlertOnce: true,
           showWhen: false,

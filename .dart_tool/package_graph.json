@@ -10,6 +10,7 @@
         "dio",
         "flutter",
         "flutter_local_notifications",
+        "package_info_plus",
         "share_plus"
       ],
       "devDependencies": [
@@ -669,6 +670,31 @@
         "collection",
         "meta",
         "pub_semver"
+      ]
+    },
+    {
+      "name": "package_info_plus",
+      "version": "8.3.1",
+      "dependencies": [
+        "clock",
+        "ffi",
+        "flutter",
+        "flutter_web_plugins",
+        "http",
+        "meta",
+        "package_info_plus_platform_interface",
+        "path",
+        "web",
+        "win32"
+      ]
+    },
+    {
+      "name": "package_info_plus_platform_interface",
+      "version": "3.2.1",
+      "dependencies": [
+        "flutter",
+        "meta",
+        "plugin_platform_interface"
       ]
     }
   ],
