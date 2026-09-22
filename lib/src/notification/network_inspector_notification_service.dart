@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /// Shows and updates the "&lt;app name&gt; Chucker" ongoing notification.
 ///
@@ -11,15 +12,24 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 /// deliberate choice to avoid adding a native Android `<service>` and
 /// `FOREGROUND_SERVICE` permission for a debug-only tool.
 class NetworkInspectorNotificationService {
-  NetworkInspectorNotificationService(this._plugin, {required String appName})
-      : _appName = appName;
+  NetworkInspectorNotificationService(this._plugin, {String? appName})
+      : _appNameOverride = appName;
 
   final FlutterLocalNotificationsPlugin _plugin;
 
-  /// Host app's name, shown in the notification title (e.g. "Chandragiri
-  /// Chucker") so it's identifiable when several debug builds are installed
-  /// at once.
-  final String _appName;
+  /// Host app's name to show in the notification title, e.g. "Chandragiri
+  /// Chucker". If not supplied at construction, it's read automatically
+  /// from the host app's own package info (the same way the notification's
+  /// icon is picked up automatically from the host app, with no explicit
+  /// config needed) and cached here.
+  String? _appNameOverride;
+
+  Future<String> _resolveAppName() async {
+    final override = _appNameOverride;
+    if (override != null) return override;
+    final info = await PackageInfo.fromPlatform();
+    return _appNameOverride = info.appName;
+  }
 
   /// Fixed notification id so every call to [show] updates the same
   /// notification instead of stacking new ones.
@@ -37,10 +47,11 @@ class NetworkInspectorNotificationService {
 
   /// Shows (or refreshes) the ongoing notification with the current
   /// captured-request [count].
-  Future<void> show(int count) {
+  Future<void> show(int count) async {
+    final appName = await _resolveAppName();
     return _plugin.show(
       notificationId,
-      '$_appName Chucker',
+      '$appName Chucker',
       '$count request${count == 1 ? '' : 's'} captured',
       const NotificationDetails(
         android: AndroidNotificationDetails(

@@ -33,7 +33,10 @@ class NetworkInspector {
   ///   can open the inspector from whichever screen is currently showing.
   /// - [appName]: the host app's name, shown in the ongoing notification
   ///   title (e.g. "Chandragiri Chucker") so it's identifiable when several
-  ///   debug builds are installed at once.
+  ///   debug builds are installed at once. If omitted, it's read
+  ///   automatically from the host app's own package info — the same way
+  ///   the notification's icon is picked up automatically with no explicit
+  ///   config needed.
   /// - [maxLogs]: how many requests to retain before the oldest is evicted
   ///   (default 500).
   /// - [notificationsPlugin]: the host app's existing
@@ -42,7 +45,7 @@ class NetworkInspector {
   ///   capturing and the in-app screens still work.
   static void initialize({
     required GlobalKey<NavigatorState> navigatorKey,
-    required String appName,
+    String? appName,
     int maxLogs = 500,
     FlutterLocalNotificationsPlugin? notificationsPlugin,
     bool enableNotification = true,

@@ -13,10 +13,16 @@ first and does nothing in a release build.
 ```dart
 NetworkInspector.initialize(
   navigatorKey: navigatorKey, // your app's root GlobalKey<NavigatorState>
-  appName: 'Chandragiri', // shown in the notification, e.g. "Chandragiri Chucker"
   notificationsPlugin: flutterLocalNotificationsPlugin, // optional
 );
+```
 
+The notification title (e.g. "Chandragiri Chucker") is picked up automatically
+from the host app's own name — no config needed, the same way the
+notification's icon is automatically the host app's icon. Pass `appName: '...'`
+to `initialize()` only if you want to override it.
+
+```dart
 dio.interceptors.add(NetworkInspectorInterceptor());
 ```
 
